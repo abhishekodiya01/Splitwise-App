@@ -30,7 +30,7 @@
                     <p class="login-subtitle">Enter your details to get started</p>
                 </div>
 
-                <form class="login-form" action="#" method="post">
+                <form id="registerForm" class="login-form" action="#" method="post">
                     <div class="form-group">
                         <label for="firstName">First Name</label>
                         <input id="firstName" name="firstName" type="text" placeholder="Enter your first name" required>
@@ -48,7 +48,8 @@
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input id="password" name="password" type="password" placeholder="Enter your password" required>
+                        <input id="password" name="password" type="password" placeholder="Enter your password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&#^()_+{}\[\]:;<>,.?/~\-]).{8,}">
+                        <span id="passwordFeedback" class="password-helper">Use at least 8 characters, including uppercase, lowercase, number, and special character.</span>
                     </div>
 
                     <div class="form-group">
@@ -65,5 +66,6 @@
             </div>
         </section>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>

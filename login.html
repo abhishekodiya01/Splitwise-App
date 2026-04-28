@@ -39,7 +39,15 @@
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input id="password" name="password" type="password" placeholder="Enter your password" required>
+                        <div class="password-wrapper">
+                            <input id="password" name="password" type="password" placeholder="Enter your password" required>
+                            <button type="button" class="toggle-password" id="togglePasswordLogin" aria-label="Toggle password visibility">
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <a href="#" class="forgot-password">Forgot Password?</a>
@@ -53,5 +61,6 @@
             </div>
         </section>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>
