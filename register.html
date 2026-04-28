@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Splitwise — Login</title>
+    <title>Splitwise — Register</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,12 +26,21 @@
         <section class="login-right">
             <div class="login-form-wrapper">
                 <div class="login-header">
-                    <p class="login-label">Login your account</p>
-                    <h1>Welcome Back!</h1>
-                    <p class="login-subtitle">Enter your email and password</p>
+                    <p class="login-label">Create your account</p>
+                    <p class="login-subtitle">Enter your details to get started</p>
                 </div>
 
                 <form class="login-form" action="#" method="post">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input id="firstName" name="firstName" type="text" placeholder="Enter your first name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input id="lastName" name="lastName" type="text" placeholder="Enter your last name" required>
+                    </div>
+
                     <div class="form-group">
                         <label for="email">Email address</label>
                         <input id="email" name="email" type="email" placeholder="Enter your Email" required>
@@ -42,13 +51,16 @@
                         <input id="password" name="password" type="password" placeholder="Enter your password" required>
                     </div>
 
-                    <a href="#" class="forgot-password">Forgot Password?</a>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm your password" required>
+                    </div>
 
-                    <button type="submit" class="btn-signin">Sign in</button>
+                    <button type="submit" class="btn-signin">Sign up</button>
                 </form>
 
                 <div class="signup-link">
-                    Don't have an account? <a href="register.html">Create one</a>
+                    Already have an account? <a href="login.html">Sign in</a>
                 </div>
             </div>
         </section>
