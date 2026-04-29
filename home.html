@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home page</title>
+</head>
+<body>
+    <div class="home-page">
+        <h2 id="welcomeText">home page</h2>
+        <button id="logoutButton" class="btn-logout">Logout</button>
+    </div>
+    
+    <script>
+        const isLoggedIn = localStorage.getItem('splitwiseLoggedIn') === 'true';
+        const storedUserStr = localStorage.getItem('splitwiseUser');
+        if (!isLoggedIn || !storedUserStr) {
+            window.location.href = 'login.html';
+        } else {
+            try {
+                const user = JSON.parse(storedUserStr);
+                const welcomeText = document.getElementById('welcomeText');
+                if (welcomeText) {
+                    welcomeText.textContent = `Welcome, ${user.name || 'User'}!`;
+                }
+            } catch (e) {
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+    <script src="script.js" type="module"></script>
+</body>
+</html>

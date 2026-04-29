@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="Data/login.webp" rel="stylesheet">
 </head>
+
 <body>
     <div class="login-container">
         <!-- Left Section Image -->
@@ -48,17 +50,22 @@
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input id="password" name="password" type="password" placeholder="Enter your password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&#^()_+{}\[\]:;<>,.?/~\-]).{8,}">
-                        <span id="passwordFeedback" class="password-helper">Use at least 8 characters, including uppercase, lowercase, number, and special character.</span>
+                        <input id="password" name="password" type="password" placeholder="Enter your password" required
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&#^()_+{}\[\]:;<>,.?/~\-]).{8,}">
+                        <span id="passwordFeedback" class="password-helper">Use at least 8 characters, including
+                            uppercase, lowercase, number, and special character.</span>
                     </div>
 
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
-                        <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm your password" required>
+                        <input id="confirmPassword" name="confirmPassword" type="password"
+                            placeholder="Confirm your password" required>
                     </div>
 
                     <button type="submit" class="btn-signin">Sign up</button>
                 </form>
+
+                <div id="registerMessage" class="form-message"></div>
 
                 <div class="signup-link">
                     Already have an account? <a href="login.html">Sign in</a>
@@ -66,6 +73,7 @@
             </div>
         </section>
     </div>
-    <script src="script.js"></script>
+    <script src="script.js" type="module"></script>
 </body>
+
 </html>
