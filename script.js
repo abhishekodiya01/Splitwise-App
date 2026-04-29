@@ -199,3 +199,46 @@ if (logoutButton) {
         }, 900);
     });
 }
+
+// Forgot Password Link
+const forgotPasswordLink = document.querySelector('.forgot-password');
+if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'pass.html';
+    });
+}
+
+// Forgot Password Form
+const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const storedUser = getStoredUser(email);
+        const resetError = document.getElementById('resetError');
+
+        if (!storedUser) {
+            const errorMessage = 'No account found with this email.';
+            toast({
+                message: errorMessage,
+                type: 'error',
+                duration: 3000,
+                position: 'bottom-right'
+            });
+            return;
+        }
+
+        toast({
+            message: `Your password is: ${storedUser.password}`,
+            type: 'success',
+            duration: 5000,
+            position: 'top-right'
+        });
+
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1500);
+    });
+}
