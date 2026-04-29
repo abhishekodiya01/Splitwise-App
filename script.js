@@ -155,7 +155,7 @@ if (loginForm) {
     });
 }
 
-// Password visibility toggle
+// Password visibility
 const togglePasswordLogin = document.getElementById('togglePasswordLogin');
 const togglePasswordRegister = document.getElementById('togglePasswordRegister');
 
@@ -200,6 +200,56 @@ if (logoutButton) {
     });
 }
 
+
+// Dashboard 
+const addExpenseBtn = document.querySelector('.btn-add-expense');
+
+
+// sample data for dashboard
+function initializeDashboard() {
+    const expensesList = document.getElementById('expensesList');
+
+    // Sample data
+    const sampleExpenses = [
+
+        { name: 'Gas', amount: 35.75, with: 'ram', icon: '⛽' }
+    ];
+
+    // expenses list
+    if (expensesList && expensesList.querySelector('.empty-state')) {
+        expensesList.innerHTML = sampleExpenses
+            .map(
+                (expense) => `
+            <div class="expense-item">
+                <div class="expense-details">
+                    <div class="expense-icon">${expense.icon}</div>
+                    <div class="expense-info">
+                        <h4>${expense.name}</h4>
+                        <p>with ${expense.with}</p>
+                    </div>
+                </div>
+                <div class="expense-amount">$${expense.amount.toFixed(2)}</div>
+            </div>
+        `
+            )
+            .join('');
+    }
+
+
+
+    // Update summary cards (mock data)
+    const youOwe = document.getElementById('youOwe');
+    const youAreOwed = document.getElementById('youAreOwed');
+
+    if (youOwe) youOwe.textContent = '$00.00';
+    if (youAreOwed) youAreOwed.textContent = '$00.00';
+}
+
+// Initialize on page load
+if (document.querySelector('.dashboard-container')) {
+    initializeDashboard();
+}
+
 // Forgot Password Link
 const forgotPasswordLink = document.querySelector('.forgot-password');
 if (forgotPasswordLink) {
@@ -221,6 +271,10 @@ if (forgotPasswordForm) {
 
         if (!storedUser) {
             const errorMessage = 'No account found with this email.';
+            if (resetError) {
+                resetError.textContent = errorMessage;
+                resetError.style.color = '#ffbaba';
+            }
             toast({
                 message: errorMessage,
                 type: 'error',
