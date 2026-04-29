@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitwise — Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="Data/login.webp" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Section Image -->
+        <section class="login-left">
+            <div class="background-image">
+                <img src="Data/login.webp" alt="Background">
+            </div>
+            <div class="left-content">
+                <h2>Splitwise</h2>
+                <p>Manage your expenses easily with friends and family</p>
+            </div>
+        </section>
+
+        <!-- Right Section Form -->
+        <section class="login-right">
+            <div class="login-form-wrapper">
+                <div class="login-header">
+                    <p class="login-label">Login your account</p>
+                    <h1>Welcome Back!</h1>
+                    <p class="login-subtitle">Enter your email and password</p>
+                </div>
+
+                <form class="login-form" action="#" method="post">
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input id="email" name="email" type="email" placeholder="Enter your Email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-wrapper">
+                            <input id="password" name="password" type="password" placeholder="Enter your password" required>
+                            <button type="button" class="toggle-password" id="togglePasswordLogin" aria-label="Toggle password visibility">
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+
+                    <button type="submit" class="btn-signin">Sign in</button>
+                </form>
+
+                <div class="signup-link">
+                    Don't have an account? <a href="register.html">Create one</a>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

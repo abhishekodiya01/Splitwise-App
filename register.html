@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitwise — Register</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="Data/login.webp" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Section Image -->
+        <section class="login-left">
+            <div class="background-image">
+                <img src="Data/login.webp" alt="Background">
+            </div>
+            <div class="left-content">
+                <h2>Splitwise</h2>
+                <p>Manage your expenses easily with friends and family</p>
+            </div>
+        </section>
+
+        <!-- Right Section Form -->
+        <section class="login-right">
+            <div class="login-form-wrapper">
+                <div class="login-header">
+                    <p class="login-label">Create your account</p>
+                    <p class="login-subtitle">Enter your details to get started</p>
+                </div>
+
+                <form id="registerForm" class="login-form" action="#" method="post">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input id="firstName" name="firstName" type="text" placeholder="Enter your first name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input id="lastName" name="lastName" type="text" placeholder="Enter your last name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input id="email" name="email" type="email" placeholder="Enter your Email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" placeholder="Enter your password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&#^()_+{}\[\]:;<>,.?/~\-]).{8,}">
+                        <span id="passwordFeedback" class="password-helper">Use at least 8 characters, including uppercase, lowercase, number, and special character.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm your password" required>
+                    </div>
+
+                    <button type="submit" class="btn-signin">Sign up</button>
+                </form>
+
+                <div class="signup-link">
+                    Already have an account? <a href="login.html">Sign in</a>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
