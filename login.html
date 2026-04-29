@@ -31,7 +31,7 @@
                     <p class="login-subtitle">Enter your email and password</p>
                 </div>
 
-                <form class="login-form" action="#" method="post">
+                <form id="loginForm" class="login-form" action="#" method="post">
                     <div class="form-group">
                         <label for="email">Email address</label>
                         <input id="email" name="email" type="email" placeholder="Enter your Email" required>
@@ -50,6 +50,8 @@
                         </div>
                     </div>
 
+                    <div id="loginError" class="form-error"></div>
+
                     <a href="#" class="forgot-password">Forgot Password?</a>
 
                     <button type="submit" class="btn-signin">Sign in</button>
@@ -61,6 +63,6 @@
             </div>
         </section>
     </div>
-    <script src="script.js"></script>
+    <script src="script.js" type="module"></script>
 </body>
 </html>

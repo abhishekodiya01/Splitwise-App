@@ -148,6 +148,17 @@ body {
     display: block;
 }
 
+.form-error,
+.form-message {
+    font-size: 0.9rem;
+    margin-top: 10px;
+    color: #b7ffd0;
+}
+
+.form-error {
+    color: #ffbaba;
+}
+
 /* PASSWORD VISIBILITY TOGGLE */
 .password-wrapper {
     position: relative;
