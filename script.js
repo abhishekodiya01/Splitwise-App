@@ -43,11 +43,77 @@ function validatePasswordMatch() {
 function getStoredUsers() {
     const data = localStorage.getItem('splitwiseUsers');
     const parsed = data ? JSON.parse(data) : null;
-    return parsed && Array.isArray(parsed.users) ? parsed.users : [];
+    const users = parsed && Array.isArray(parsed.users) ? parsed.users : [];
+    return users.map((user) => ({
+        ...user,
+        pay: Number(user.pay || 0),
+        receive: Number(user.receive || 0)
+    }));
 }
 
 function saveStoredUsers(users) {
     localStorage.setItem('splitwiseUsers', JSON.stringify({ users }));
+}
+
+function generateId() {
+    return `group_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function getStoredGroups() {
+    const data = localStorage.getItem('splitwiseGroups');
+    const groups = data ? JSON.parse(data) : [];
+    let updated = false;
+    const normalized = groups.map((group) => {
+        if (!group.id) {
+            updated = true;
+            return { ...group, id: generateId() };
+        }
+        return group;
+    });
+    if (updated) {
+        saveStoredGroups(normalized);
+    }
+    return normalized;
+}
+
+function saveStoredGroups(groups) {
+    localStorage.setItem('splitwiseGroups', JSON.stringify(groups));
+}
+
+function updateUserBalancesFromGroups() {
+    const users = getStoredUsers();
+    const groups = getStoredGroups();
+    const balances = users.reduce((acc, user) => {
+        acc[user.email] = { pay: 0, receive: 0 };
+        return acc;
+    }, {});
+
+    groups.forEach((group) => {
+        const totalAmount = Number(group.amount) || 0;
+        const members = Array.isArray(group.members) ? group.members : [];
+        const memberCount = members.length;
+        if (memberCount === 0 || totalAmount <= 0) return;
+
+        const share = totalAmount / memberCount;
+        const creatorEmail = group.creatorEmail || members[0];
+
+        members.forEach((memberEmail) => {
+            if (!balances[memberEmail]) return;
+            if (memberEmail === creatorEmail) {
+                balances[memberEmail].receive += totalAmount - share;
+            } else {
+                balances[memberEmail].pay += share;
+            }
+        });
+    });
+
+    const updatedUsers = users.map((user) => ({
+        ...user,
+        pay: Number(balances[user.email]?.pay.toFixed(2) || 0),
+        receive: Number(balances[user.email]?.receive.toFixed(2) || 0)
+    }));
+    saveStoredUsers(updatedUsers);
+    return updatedUsers;
 }
 
 function getStoredUser(email) {
@@ -97,10 +163,12 @@ if (registerForm) {
         const user = {
             name: `${firstName} ${lastName}`.trim(),
             email,
-            password
+            password,
+            pay: 0,
+            receive: 0
         };
 
-        saveStoredUsers([...existingUsers, user]);
+        saveStoredUsers([...existingUsers, user]);  // adding in existing users
 
         toast({
             message: 'Registration successful',
@@ -138,9 +206,13 @@ if (loginForm) {
             return;
         }
 
+        // Update balances before login
+        updateUserBalancesFromGroups();
+        const freshUser = getStoredUser(email);
+
         localStorage.setItem('splitwiseLoggedIn', 'true');
-        localStorage.setItem('splitwiseLoggedInUser', storedUser.email);
-        localStorage.setItem('splitwiseUser', JSON.stringify(storedUser));
+        localStorage.setItem('splitwiseLoggedInUser', freshUser.email);
+        localStorage.setItem('splitwiseUser', JSON.stringify(freshUser));
 
         toast({
             message: 'Login successful',
@@ -151,6 +223,29 @@ if (loginForm) {
 
         setTimeout(() => {
             window.location.href = 'home.html';
+        }, 900);
+    });
+}
+
+// logout
+
+const logoutButton = document.getElementById('logoutButton');
+if (logoutButton) {
+    logoutButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('splitwiseLoggedIn');
+        localStorage.removeItem('splitwiseLoggedInUser');
+        localStorage.removeItem('splitwiseUser');
+
+        toast({
+            message: 'You have been logged out.',
+            duration: 3000,
+            type: 'success',
+            position: 'top-right'
+        });
+
+        setTimeout(() => {
+            window.location.href = 'login.html';
         }, 900);
     });
 }
@@ -179,78 +274,342 @@ if (togglePasswordRegister) {
     });
 }
 
-const logoutButton = document.getElementById('logoutButton');
-if (logoutButton) {
-    logoutButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        localStorage.removeItem('splitwiseLoggedIn');
-        localStorage.removeItem('splitwiseLoggedInUser');
-        localStorage.removeItem('splitwiseUser');
 
+// home page
+const isHomePage = window.location.pathname.endsWith('home.html') || window.location.pathname.endsWith('home.htm');
+if (isHomePage) {
+    const isLoggedIn = localStorage.getItem('splitwiseLoggedIn') === 'true';
+    const storedUserStr = localStorage.getItem('splitwiseUser');
+    if (!isLoggedIn || !storedUserStr) {
+        window.location.href = 'login.html';
+    } else {
+        try {
+            updateUserBalancesFromGroups();
+            const currentUserEmail = localStorage.getItem('splitwiseLoggedInUser');
+            const freshUser = getStoredUser(currentUserEmail);
+            localStorage.setItem('splitwiseUser', JSON.stringify(freshUser));
+
+            const welcomeText = document.getElementById('welcomeText');
+            if (welcomeText) {
+                welcomeText.textContent = `Hello, ${freshUser.name || 'User'}!`;
+            }
+        } catch (e) {
+            window.location.href = 'login.html';
+        }
+    }
+
+    const addExpenseBtn = document.querySelector('.btn-add-expense');
+    if (addExpenseBtn) {
+        addExpenseBtn.addEventListener('click', () => {
+            showCreateGroupModal();
+        });
+    }
+}
+
+function initializeDashboard() {
+    const expensesList = document.getElementById('expensesList');
+    const currentUserEmail = localStorage.getItem('splitwiseLoggedInUser');
+    const groups = getStoredGroups();
+    updateUserBalancesFromGroups();
+    const currentUser = getStoredUser(currentUserEmail);
+    const userGroups = groups.filter((group) => group.members.includes(currentUserEmail));
+
+    if (expensesList) {
+        if (userGroups.length === 0) {
+            expensesList.innerHTML = '<div class="empty-state"><p>No groups yet</p></div>';
+        } else {
+            expensesList.innerHTML = userGroups
+                .map((group) => {
+                    const totalAmount = Number(group.amount) || 0;
+                    const memberCount = group.members.length;
+                    const share = memberCount ? totalAmount / memberCount : 0;
+                    const isCreator = group.creatorEmail === currentUserEmail;
+                    const subtitle = isCreator
+                        ? `You will receive ₹${(totalAmount - share).toFixed(2)} from ${memberCount - 1} member(s)`
+                        : `You owe ₹${share.toFixed(2)} to ${getStoredUser(group.creatorEmail)?.name || 'group creator'}`;
+                    const actionButtons = isCreator
+                        ? `<div class="group-actions">
+                                <button class="btn-edit-group" data-group-id="${group.id}">Edit</button>
+                                <button class="btn-delete-group" data-group-id="${group.id}">Delete</button>
+                           </div>`
+                        : '';
+                    return `
+            <div class="expense-item">
+                <div class="expense-details">
+                    <div class="expense-info">
+                        <h4>${group.name}</h4>
+                        <p>${subtitle}</p>
+                    </div>
+                </div>
+                <div class="expense-amount-section">
+                    <div class="expense-amount">₹${totalAmount.toFixed(2)}</div>
+                    ${actionButtons}
+                </div>
+            </div>
+        `;
+                })
+                .join('');
+            document.querySelectorAll('.btn-edit-group').forEach((button) => {
+                button.addEventListener('click', () => {
+                    showEditGroupModal(button.dataset.groupId);
+                });
+            });
+            document.querySelectorAll('.btn-delete-group').forEach((button) => {
+                button.addEventListener('click', () => {
+                    deleteGroup(button.dataset.groupId);
+                });
+            });
+        }
+    }
+
+    const youOwe = document.getElementById('youOwe');
+    const youAreOwed = document.getElementById('youAreOwed');
+
+    if (youOwe) youOwe.textContent = `₹${(currentUser?.pay || 0).toFixed(2)}`;
+    if (youAreOwed) youAreOwed.textContent = `₹${(currentUser?.receive || 0).toFixed(2)}`;
+}
+
+function showCreateGroupModal() {
+    const users = getStoredUsers();
+    const currentUserEmail = localStorage.getItem('splitwiseLoggedInUser');
+    let modalHTML = `
+        <div class="modal" id="createGroupModal">
+            <div class="modal-content">
+                <button class="close-modal" id="closeModal">&times;</button>
+                <h3>Create New Group</h3>
+                <form id="createGroupForm">
+                    <div class="form-group">
+                        <label for="groupName">Group Name</label>
+                        <input type="text" id="groupName" placeholder="Enter group name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="groupAmount">Amount</label>
+                        <input type="number" id="groupAmount" placeholder="Enter amount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Members (You are included automatically)</label>
+                        <div class="users-list">
+    `;
+    users.forEach(user => {
+        const isCurrentUser = user.email === currentUserEmail;
+        const checked = isCurrentUser ? 'checked disabled' : '';
+        modalHTML += `
+            <div class="user-item">
+                <input type="checkbox" id="user_${user.email}" value="${user.email}" ${checked}>
+                <label for="user_${user.email}">${user.name}${isCurrentUser ? ' (You)' : ''}</label>
+            </div>
+        `;
+    });
+    modalHTML += `
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">Create Group</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+
+
+    const modal = document.getElementById('createGroupModal');
+    const closeBtn = document.getElementById('closeModal');
+    const form = document.getElementById('createGroupForm');
+
+    closeBtn.addEventListener('click', () => {
+        modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const groupName = document.getElementById('groupName').value.trim();
+        const groupAmount = parseFloat(document.getElementById('groupAmount').value);
+        const selectedUsers = Array.from(document.querySelectorAll('#createGroupModal input[type="checkbox"]:checked')).map(cb => cb.value);
+
+        if (groupName && groupAmount > 0 && selectedUsers.length > 0) {
+            const groups = getStoredGroups();
+            const newGroup = {
+                id: generateId(),
+                name: groupName,
+                amount: groupAmount,
+                members: selectedUsers,
+                creatorEmail: currentUserEmail,
+                createdAt: new Date().toISOString()
+            };
+            groups.push(newGroup);
+            saveStoredGroups(groups);
+            updateUserBalancesFromGroups();
+            modal.remove();
+            initializeDashboard();
+            toast({
+                message: 'Group created successfully',
+                type: 'success',
+                duration: 3000,
+                position: 'top-right'
+            });
+        } else {
+            toast({
+                message: 'Please fill all fields and select at least one member',
+                type: 'error',
+                duration: 3000,
+                position: 'top-right'
+            });
+        }
+    });
+}
+
+function deleteGroup(groupId) {
+    const groups = getStoredGroups();
+    const groupIndex = groups.findIndex((group) => group.id === groupId);
+    if (groupIndex === -1) {
         toast({
-            message: 'You have been logged out.',
+            message: 'Group not found',
+            type: 'error',
             duration: 3000,
-            type: 'success',
             position: 'top-right'
         });
+        return;
+    }
+    const currentUserEmail = localStorage.getItem('splitwiseLoggedInUser');
+    if (groups[groupIndex].creatorEmail !== currentUserEmail) {
+        toast({
+            message: 'You do not have permission to delete this group',
+            type: 'error',
+            duration: 3000,
+            position: 'top-right'
+        });
+        return;
+    }
+    groups.splice(groupIndex, 1);
+    saveStoredGroups(groups);
+    updateUserBalancesFromGroups();
+    initializeDashboard();
+    toast({
+        message: 'Group deleted successfully',
+        type: 'success',
+        duration: 3000,
+        position: 'top-right'
+    });
+}
 
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 900);
+function showEditGroupModal(groupId) {
+    const groups = getStoredGroups();
+    const groupIndex = groups.findIndex((group) => group.id === groupId);
+    const group = groups[groupIndex];
+    const users = getStoredUsers();
+    const currentUserEmail = localStorage.getItem('splitwiseLoggedInUser');
+
+    if (!group || group.creatorEmail !== currentUserEmail) {
+        toast({
+            message: 'You do not have permission to edit this group',
+            type: 'error',
+            duration: 3000,
+            position: 'top-right'
+        });
+        return;
+    }
+
+    let modalHTML = `
+        <div class="modal" id="editGroupModal">
+            <div class="modal-content">
+                <button class="close-modal" id="closeEditModal">&times;</button>
+                <h3>Edit Group</h3>
+                <form id="editGroupForm">
+                    <div class="form-group">
+                        <label for="editGroupName">Group Name</label>
+                        <input type="text" id="editGroupName" placeholder="Enter group name" value="${group.name}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGroupAmount">Amount</label>
+                        <input type="number" id="editGroupAmount" placeholder="Enter amount" step="0.01" value="${group.amount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Members (You are always included)</label>
+                        <div class="users-list">
+    `;
+    users.forEach(user => {
+        const isCurrentUser = user.email === currentUserEmail;
+        const isSelected = group.members.includes(user.email);
+        const checked = isCurrentUser || isSelected ? 'checked' : '';
+        const disabled = isCurrentUser ? 'disabled' : '';
+        modalHTML += `
+            <div class="user-item">
+                <input type="checkbox" id="edit_user_${user.email}" value="${user.email}" ${checked} ${disabled}>
+                <label for="edit_user_${user.email}">${user.name}${isCurrentUser ? ' (You)' : ''}</label>
+            </div>
+        `;
+    });
+    modalHTML += `
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    const modal = document.getElementById('editGroupModal');
+    const closeBtn = document.getElementById('closeEditModal');
+    const form = document.getElementById('editGroupForm');
+
+    closeBtn.addEventListener('click', () => {
+        modal.remove();
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const groupName = document.getElementById('editGroupName').value.trim();
+        const groupAmount = parseFloat(document.getElementById('editGroupAmount').value);
+        const selectedUsers = Array.from(document.querySelectorAll('#editGroupModal input[type="checkbox"]:checked')).map(cb => cb.value);
+
+        if (groupName && groupAmount > 0 && selectedUsers.length > 0) {
+            groups[groupIndex] = {
+                ...group,
+                name: groupName,
+                amount: groupAmount,
+                members: selectedUsers
+            };
+            saveStoredGroups(groups);
+            updateUserBalancesFromGroups();
+            modal.remove();
+            initializeDashboard();
+            toast({
+                message: 'Group updated successfully',
+                type: 'success',
+                duration: 3000,
+                position: 'top-right'
+            });
+        } else {
+            toast({
+                message: 'Please fill all fields and select at least one member',
+                type: 'error',
+                duration: 3000,
+                position: 'top-right'
+            });
+        }
     });
 }
 
 
-// Dashboard 
-const addExpenseBtn = document.querySelector('.btn-add-expense');
-
-
-// sample data for dashboard
-function initializeDashboard() {
-    const expensesList = document.getElementById('expensesList');
-
-    // Sample data
-    const sampleExpenses = [
-
-        { name: 'Gas', amount: 35.75, with: 'ram', icon: '⛽' }
-    ];
-
-    // expenses list
-    if (expensesList && expensesList.querySelector('.empty-state')) {
-        expensesList.innerHTML = sampleExpenses
-            .map(
-                (expense) => `
-            <div class="expense-item">
-                <div class="expense-details">
-                    <div class="expense-icon">${expense.icon}</div>
-                    <div class="expense-info">
-                        <h4>${expense.name}</h4>
-                        <p>with ${expense.with}</p>
-                    </div>
-                </div>
-                <div class="expense-amount">$${expense.amount.toFixed(2)}</div>
-            </div>
-        `
-            )
-            .join('');
-    }
-
-
-
-    // Update summary cards (mock data)
-    const youOwe = document.getElementById('youOwe');
-    const youAreOwed = document.getElementById('youAreOwed');
-
-    if (youOwe) youOwe.textContent = '$00.00';
-    if (youAreOwed) youAreOwed.textContent = '$00.00';
-}
-
-// Initialize on page load
 if (document.querySelector('.dashboard-container')) {
     initializeDashboard();
 }
 
-// Forgot Password Link
+
+// Forgot Password
 const forgotPasswordLink = document.querySelector('.forgot-password');
 if (forgotPasswordLink) {
     forgotPasswordLink.addEventListener('click', (e) => {
@@ -296,3 +655,4 @@ if (forgotPasswordForm) {
         }, 1500);
     });
 }
+

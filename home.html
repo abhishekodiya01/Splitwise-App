@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Splitwise - Dashboard</title>
+    <link rel="icon" href="Data/icon.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="home.css">
 </head>
@@ -26,7 +27,7 @@
                     <p class="header-subtitle">Manage your expenses with friends</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-add-expense">Create Group</button>
+                    <button class="btn-add-expense" id="create-groups">Create Group</button>
                 </div>
             </header>
 
@@ -49,35 +50,17 @@
 
                 <section class="card recent-expenses">
                     <div class="card-title-section">
-                        <h3>Recent Expenses</h3>
+                        <h3>Expenses</h3>
                     </div>
                     <div class="expenses-list" id="expensesList">
                         <div class="empty-state">
-                            <p>No expenses yet</p>
+                            <!-- <p>No expenses yet</p> -->
                         </div>
                     </div>
                 </section>
             </div>
         </main>
     </div>
-
-    <script>
-        const isLoggedIn = localStorage.getItem('splitwiseLoggedIn') === 'true';
-        const storedUserStr = localStorage.getItem('splitwiseUser');
-        if (!isLoggedIn || !storedUserStr) {
-            window.location.href = 'login.html';
-        } else {
-            try {
-                const user = JSON.parse(storedUserStr);
-                const welcomeText = document.getElementById('welcomeText');
-                if (welcomeText) {
-                    welcomeText.textContent = `Hello, ${user.name || 'User'}!`;
-                }
-            } catch (e) {
-                window.location.href = 'login.html';
-            }
-        }
-    </script>
     <script src="script.js" type="module"></script>
 </body>
 
