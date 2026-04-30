@@ -1,33 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home page</title>
+    <title>Splitwise - Dashboard</title>
+    <link rel="icon" href="Data/icon.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css">
 </head>
+
 <body>
-    <div class="home-page">
-        <h2 id="welcomeText">home page</h2>
-        <button id="logoutButton" class="btn-logout">Logout</button>
+    <div class="dashboard-container">
+        <nav class="top-nav">
+            <div class="nav-left">
+                <h1 class="logo">Splitwise</h1>
+            </div>
+            <button id="logoutButton" class="btn-logout">Logout</button>
+        </nav>
+
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="header-title">
+                    <h2 id="welcomeText">Hello</h2>
+                    <p class="header-subtitle">Manage your expenses with friends</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-add-expense" id="create-groups">Create Group</button>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <section class="summary-section">
+                    <div class="summary-card card-owed">
+                        <div class="card-header">
+                            <span class="card-title">To pay back</span>
+                        </div>
+                        <div class="card-amount red" id="youOwe">$0.00</div>
+                    </div>
+
+                    <div class="summary-card card-owes">
+                        <div class="card-header">
+                            <span class="card-title">To receive</span>
+                        </div>
+                        <div class="card-amount green" id="youAreOwed">$0.00</div>
+                    </div>
+                </section>
+
+                <section class="card recent-expenses">
+                    <div class="card-title-section">
+                        <h3>Expenses</h3>
+                    </div>
+                    <div class="expenses-list" id="expensesList">
+                        <div class="empty-state">
+                            <!-- <p>No expenses yet</p> -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
-    
-    <script>
-        const isLoggedIn = localStorage.getItem('splitwiseLoggedIn') === 'true';
-        const storedUserStr = localStorage.getItem('splitwiseUser');
-        if (!isLoggedIn || !storedUserStr) {
-            window.location.href = 'login.html';
-        } else {
-            try {
-                const user = JSON.parse(storedUserStr);
-                const welcomeText = document.getElementById('welcomeText');
-                if (welcomeText) {
-                    welcomeText.textContent = `Welcome, ${user.name || 'User'}!`;
-                }
-            } catch (e) {
-                window.location.href = 'login.html';
-            }
-        }
-    </script>
     <script src="script.js" type="module"></script>
 </body>
+
 </html>
