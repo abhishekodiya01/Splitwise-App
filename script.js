@@ -178,7 +178,7 @@ if (registerForm) {
         });
 
         setTimeout(() => {
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }, 900);
     });
 }
@@ -245,7 +245,7 @@ if (logoutButton) {
         });
 
         setTimeout(() => {
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }, 900);
     });
 }
@@ -281,7 +281,7 @@ if (isHomePage) {
     const isLoggedIn = localStorage.getItem('splitwiseLoggedIn') === 'true';
     const storedUserStr = localStorage.getItem('splitwiseUser');
     if (!isLoggedIn || !storedUserStr) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     } else {
         try {
             updateUserBalancesFromGroups();
@@ -294,7 +294,7 @@ if (isHomePage) {
                 welcomeText.textContent = `Hello, ${freshUser.name || 'User'}!`;
             }
         } catch (e) {
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }
     }
 
@@ -651,7 +651,7 @@ if (forgotPasswordForm) {
         });
 
         setTimeout(() => {
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }, 1500);
     });
 }
