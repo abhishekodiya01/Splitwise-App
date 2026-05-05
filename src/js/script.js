@@ -1,4 +1,4 @@
-import { toast } from './node_modules/mytoastfy/dist/index.js';
+import { toast } from '../../node_modules/mytoastfy/dist/index.js';
 
 const registerForm = document.getElementById('registerForm');
 const loginForm = document.getElementById('loginForm');
